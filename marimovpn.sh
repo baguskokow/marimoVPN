@@ -9,7 +9,7 @@ skipped="SKIPPED"
 
 # working directory
 workdir=/etc/ssl/marimocerts
-log=./log/marimo.log
+log=/var/log/marimo.log
 caDir=$workdir/ca
 dhDir=$workdir/diffie-hellman
 tlsDir=$workdir/tls
@@ -18,6 +18,11 @@ clientDir=$workdir/client
 
 # Certificates
 certificates=("ca.key" "ca.crt" "serial" "dh.pem" "ta.key" "server.key" "server.crt" "client.key" "client.crt")
+
+# To do : Create logic =  package openvpn & openssl are installed 
+
+### Ensure Packages are installed
+
 
 # Checking Certificate Directory
 
@@ -61,7 +66,7 @@ if [ $(echo $?) != 0 ]; then
 		echo -e "Generating Root CA Certificate		| $success"
 	fi
 else
-	echo -e "Creating Root CA Certificate		| $skipped | Certificate  Already Exist"
+	echo -e "Generating Root CA Certificate		| $skipped | Certificate  Already Exist"
 fi
 
 ### Generate Diffie–Hellman Key
@@ -158,7 +163,7 @@ if [ $(echo $?) != 0 ]; then
 		echo -e "Generating Server Certificate		| $success"
 	fi
 else
-	echo -e "Creating Server  Certificate		| $skipped | Certificate  Already Exist"
+	echo -e "Generating Server  Certificate		| $skipped | Certificate  Already Exist"
 fi
 
 # To do : Bikin Certificate untuk Client
@@ -175,4 +180,23 @@ if [ $(echo $?) != 0 ]; then
 		echo "Exited"
 		exit
 	fi
+fi
+
+# Checking certificate
+ls $clientDir | grep ${certificates[7]} > /dev/null && ls $clientDir | grep ${certificates[8]} > /dev/null
+
+# Generate Certificate
+if [ $(echo $?) != 0 ]; then
+		openssl genrsa -out $clientDir/${certificates[7]} 2> /dev/null
+		openssl req -new -key $clientDir/${certificates[7]} -out $clientDir/client.csr -subj "/C=ID/ST=Jakarta/CN=client" 2> /dev/null
+		openssl x509 -req -in $clientDir/client.csr -out $clientDir/${certificates[8]} -CA $caDir/${certificates[1]} -CAkey $caDir/${certificates[0]} -CAserial $caDir/${certificates[2]} -days 365 2> /dev/null
+		openssl verify -CAfile $caDir/${certificates[1]} $clientDir/${certificates[8]} > /dev/null
+	if [ $(echo $?) != 0 ]; then
+		echo -e "Generating Client Certificate		| $failed"
+		exit
+	else
+		echo -e "Generating Client Certificate		| $success"
+	fi
+else
+	echo -e "Generating Client  Certificate		| $skipped | Certificate  Already Exist"
 fi

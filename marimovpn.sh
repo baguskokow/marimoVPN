@@ -19,6 +19,9 @@ clientDir=$workdir/client
 # Certificates
 certificates=("ca.key" "ca.crt" "serial" "dh.pem" "ta.key" "server.key" "server.crt" "client.key" "client.crt")
 
+# Time Duration
+startTime=$(date +%s)
+
 ### Ensure Packages are installed
 
 opensslVersion=$(openssl version | awk '{print $1 " = " "v"$2}')
@@ -205,3 +208,8 @@ if [ $(echo $?) != 0 ]; then
 else
 	echo -e "Generating Client  Certificate		| $skipped | Certificate  Already Exist"
 fi
+
+endTime=$(date +%s)
+elapsedTime=$(($endTime - $startTime))
+
+echo -e "\nElapsed Time : $elapsedTime seconds"

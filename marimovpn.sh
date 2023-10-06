@@ -19,10 +19,17 @@ clientDir=$workdir/client
 # Certificates
 certificates=("ca.key" "ca.crt" "serial" "dh.pem" "ta.key" "server.key" "server.crt" "client.key" "client.crt")
 
-# To do : Create logic =  package openvpn & openssl are installed 
-
 ### Ensure Packages are installed
 
+opensslVersion=$(openssl version | awk '{print $1 " = " "v"$2}')
+openvpnVersion=$(openvpn --version | head -n 1 | awk '{print $1 " = " "v"$2}')
+
+if [ $(echo $opensslVersion | grep -Eo OpenSSL) == "OpenSSL" ] && [ $(echo $openvpnVersion | grep -Eo OpenVPN) == "OpenVPN" ]; then
+	echo -e "Ensuring Packages are Installed		| $success | [ $opensslVersion ] & [ $openvpnVersion ]"
+else
+	echo -e "Ensuring Packages are Installed		| $failed | Please Install openssl & openvpn!"
+	exit
+fi
 
 # Checking Certificate Directory
 
@@ -165,8 +172,6 @@ if [ $(echo $?) != 0 ]; then
 else
 	echo -e "Generating Server  Certificate		| $skipped | Certificate  Already Exist"
 fi
-
-# To do : Bikin Certificate untuk Client
 
 ### Generate Client Certificate
 

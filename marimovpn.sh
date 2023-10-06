@@ -28,9 +28,9 @@ opensslVersion=$(openssl version | awk '{print $1 " = " "v"$2}')
 openvpnVersion=$(openvpn --version | head -n 1 | awk '{print $1 " = " "v"$2}')
 
 if [ $(echo $opensslVersion | grep -Eo OpenSSL) == "OpenSSL" ] && [ $(echo $openvpnVersion | grep -Eo OpenVPN) == "OpenVPN" ]; then
-	echo -e "Ensuring Packages are Installed				| $success | [ $opensslVersion ] & [ $openvpnVersion ]"
+	echo -e "Ensuring Packages are Installed\t\t\t\t| $success | [ $opensslVersion ] & [ $openvpnVersion ]"
 else
-	echo -e "Ensuring Packages are Installed				| $failed | Please Install openssl & openvpn!"
+	echo -e "Ensuring Packages are Installed\t\t\t\t| $failed | Please Install openssl & openvpn!"
 	exit
 fi
 
@@ -41,13 +41,13 @@ ls /etc/ssl/ | grep marimocerts > /dev/null
 if [ $(echo $?) != 0 ]; then
 	mkdir $workdir 2>> $log
 	if [ $(echo $?) != 0 ]; then
-		echo -e "Creating Certificate Directory				| $failed "
+		echo -e "Creating Certificate Directory\t\t\t\t| $failed "
 		exit
 	else
-		echo -e "Creating Certificate Directory				| $success "
+		echo -e "Creating Certificate Directory\t\t\t\t| $success "
 	fi
 else
-	echo -e "Creating Certificate Directory				| $skipped | Directory Already Exist"
+	echo -e "Creating Certificate Directory\t\t\t\t| $skipped | Directory Already Exist"
 fi
 
 ### Generate Root CA
@@ -70,13 +70,13 @@ ls $workdir/ca/ | grep ca.key > /dev/null && ls $workdir/ca/ | grep ca.crt > /de
 if [ $(echo $?) != 0 ]; then
 		openssl req -x509 -nodes -newkey rsa:2048 -keyout $caDir/${certificates[0]} -out $caDir/${certificates[1]} -subj "/C=ID/ST=Jakarta/O=marimovpn/CN=ROOT CA" 2>> $log && echo "01" | tee $caDir/${certificates[2]} > /dev/null
 	if [ $(echo $?) != 0 ]; then
-		echo -e "Generating Root CA Certificate				| $failed"
+		echo -e "Generating Root CA Certificate\t\t\t\t| $failed"
 		exit
 	else
-		echo -e "Generating Root CA Certificate				| $success"
+		echo -e "Generating Root CA Certificate\t\t\t\t| $success"
 	fi
 else
-	echo -e "Generating Root CA Certificate				| $skipped | Certificate  Already Exist"
+	echo -e "Generating Root CA Certificate\t\t\t\t| $skipped | Certificate  Already Exist"
 fi
 
 ### Generate Diffie–Hellman Key
@@ -102,13 +102,13 @@ ls $dhDir | grep ${certificates[3]} > /dev/null
 if [ $(echo $?) != 0 ]; then
 	openssl dhparam -out $dhDir/${certificates[3]} 2048 2> /dev/null
 	if [ $(echo $?) != 0 ]; then
-		echo -e "Generating  Diffie–Hellman Key				| $failed"
+		echo -e "Generating  Diffie–Hellman Key\t\t\t\t| $failed"
 		exit
 	else
-		echo -e "Generating  Diffie–Hellman Key				| $success"
+		echo -e "Generating  Diffie–Hellman Key\t\t\t\t| $success"
 	fi
 else
-		echo -e "Generating  Diffie–Hellman Key				| $skipped | Key Already Exist"
+		echo -e "Generating  Diffie–Hellman Key\t\t\t\t| $skipped | Key Already Exist"
 fi
 
 ### Generate TLS Key
@@ -134,13 +134,13 @@ ls $tlsDir | grep ${certificates[4]} > /dev/null
 if [ $(echo $?) != 0 ]; then
 	openvpn --genkey secret $tlsDir/${certificates[4]} 2> /dev/null
 	if [ $(echo $?) != 0 ]; then
-		echo -e "Generating  TLS Key					| $failed"
+		echo -e "Generating  TLS Key\t\t\t\t\t| $failed"
 		exit
 	else
-		echo -e "Generating  TLS Key					| $success"
+		echo -e "Generating  TLS Key\t\t\t\t\t| $success"
 	fi
 else
-		echo -e "Generating  TLS Key					| $skipped | TLS Key Already Exist"
+		echo -e "Generating  TLS Key\t\t\t\t\t| $skipped | TLS Key Already Exist"
 fi
 
 ### Generate Server Certificate
@@ -167,13 +167,13 @@ if [ $(echo $?) != 0 ]; then
 		openssl x509 -req -in $serverDir/server.csr -out $serverDir/${certificates[6]} -CA $caDir/${certificates[1]} -CAkey $caDir/${certificates[0]} -CAserial $caDir/${certificates[2]} -days 365 2> /dev/null
 		openssl verify -CAfile $caDir/${certificates[1]} $serverDir/${certificates[6]} > /dev/null
 	if [ $(echo $?) != 0 ]; then
-		echo -e "Generating Server Certificate				| $failed"
+		echo -e "Generating Server Certificate\t\t\t\t| $failed"
 		exit
 	else
-		echo -e "Generating Server Certificate				| $success"
+		echo -e "Generating Server Certificate\t\t\t\t| $success"
 	fi
 else
-	echo -e "Generating Server  Certificate				| $skipped | Certificate  Already Exist"
+	echo -e "Generating Server  Certificate\t\t\t\t| $skipped | Certificate  Already Exist"
 fi
 
 ### Generate Client Certificate
@@ -200,13 +200,13 @@ if [ $(echo $?) != 0 ]; then
 		openssl x509 -req -in $clientDir/client.csr -out $clientDir/${certificates[8]} -CA $caDir/${certificates[1]} -CAkey $caDir/${certificates[0]} -CAserial $caDir/${certificates[2]} -days 365 2> /dev/null
 		openssl verify -CAfile $caDir/${certificates[1]} $clientDir/${certificates[8]} > /dev/null
 	if [ $(echo $?) != 0 ]; then
-		echo -e "Generating Client Certificate				| $failed"
+		echo -e "Generating Client Certificate\t\t\t\t| $failed"
 		exit
 	else
-		echo -e "Generating Client Certificate				| $success"
+		echo -e "Generating Client Certificate\t\t\t\t| $success"
 	fi
 else
-	echo -e "Generating Client  Certificate				| $skipped | Certificate  Already Exist"
+	echo -e "Generating Client  Certificate\t\t\t\t| $skipped | Certificate  Already Exist"
 fi
 
 ### Ensuring config file is created
@@ -214,12 +214,12 @@ fi
 ls | grep config.txt > /dev/null
 
 if [ $(echo $?) != 0 ]; then
-	echo -e "Ensuring config file is created				| $failed"
+	echo -e "Ensuring config file is created\t\t\t\t| $failed"
 	echo "Exited"
 	echo "Configuration File not yet created. Please create the config file!" >> $log
 	exit
 else
-	echo -e "Ensuring config file is created				| $success"
+	echo -e "Ensuring config file is created\t\t\t\t| $success"
 fi
 
 # To do : Buat gimana caranya agar mendeteksi confignya itu benar atau salah
@@ -301,21 +301,21 @@ ls /etc/openvpn/ | grep server.conf > /dev/null
 if [ $(echo $?) != 0 ]; then
 	$(serverConfiguration)
 	if [ $(echo $?) != 0 ]; then
-		echo -e "Generating Configuration File for Server		| $failed"
+		echo -e "Generating Configuration File for Server\t\t| $failed"
 		echo "Exited"
 		exit
 	else
-		echo -e "Generating Configuration File for Server		| $success"
+		echo -e "Generating Configuration File for Server\t\t| $success"
 	fi
 else
-	echo -e "Generating Configuration File for Server		| $skipped | Configuration Server is exist\n"
+	echo -e "Generating Configuration File for Server\t\t| $skipped | Configuration Server is exist\n"
 	declare userInput
 	read -p "You want to replace it with a new server configuration file? (y/n) " userInput
 	if [ $userInput == 'y' ]; then
 		$(serverConfiguration)
-		echo -e "\nReplacing Configuration File for Server			| $success"
+		echo -e "\nReplacing Configuration File for Server\t\t\t| $success"
 	else
-		echo -e "\nReplacing Configuration File for Server			| $skipped"
+		echo -e "\nReplacing Configuration File for Server\t\t\t| $skipped"
 	fi
 fi
 
@@ -326,21 +326,21 @@ ls /etc/openvpn/client | grep client.ovpn > /dev/null
 if [ $(echo $?) != 0 ]; then
 	$(clientConfiguration)
 	if [ $(echo $?) != 0 ]; then
-		echo -e "Generating Configuration File for Client		| $failed"
+		echo -e "Generating Configuration File for Client\t\t| $failed"
 		echo "Exited"
 		exit
 	else
-		echo -e "Generating Configuration File for Client		| $success"
+		echo -e "Generating Configuration File for Client\t\t| $success"
 	fi
 else
-	echo -e "Generating Configuration File for Client		| $skipped | Configuration Client is exist\n"
+	echo -e "Generating Configuration File for Client\t\t| $skipped | Configuration Client is exist\n"
 	declare userInput
 	read -p "You want to replace it with a new client configuration file? (y/n) " userInput
 	if [ $userInput == 'y' ]; then
 		$(serverConfiguration)
-		echo -e "\nReplacing Configuration File for Client			| $success"
+		echo -e "\nReplacing Configuration File for Client\t\t\t| $success"
 	else
-		echo -e "\nReplacing Configuration File for Client			| $skipped"
+		echo -e "\nReplacing Configuration File for Client\t\t\t| $skipped"
 	fi
 fi
 

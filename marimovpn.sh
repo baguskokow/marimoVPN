@@ -227,8 +227,6 @@ else
 	echo -e "Ensuring config file is created\t\t\t\t| $success"
 fi
 
-# To do : Buat gimana caranya agar mendeteksi confignya itu benar atau salah
-
 ### Read from config.txt
 port=$(cat config.txt | grep port | awk '{print $3}')
 protocol=$(cat config.txt | grep protocol | awk '{print $3}')
@@ -348,8 +346,6 @@ else
 		echo -e "\nReplacing Configuration File for Client\t\t\t| $skipped"
 	fi
 fi
-
-# To do : Buat Agar bisa running servicenya & buat summary info ex: nama service, dll
 
 ### Restarting Service
 

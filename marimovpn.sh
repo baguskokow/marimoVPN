@@ -1,6 +1,11 @@
+#### MarimoVPN v1.0
+#### Written by Bagus Koko Wibawanto
+#### Repository : https://github.com/baguskokow/marimoVPN
+
 # Colors
 white='\033[0m'
 red='\033[1;31m'
+yellow='\033[0;33m'
 
 # Status
 failed="${red}FAILED${white}"
@@ -56,7 +61,7 @@ fi
 ls $workdir | grep ca > /dev/null
 
 if [ $(echo $?) != 0 ]; then
-	mkdir $caDir 2> $log
+	mkdir $caDir 2>> $log
 	if [ $(echo $?) != 0 ]; then
 		echo "Exited"
 		exit
@@ -86,7 +91,7 @@ fi
 ls $workdir | grep diffie-hellman > /dev/null
 
 if [ $(echo $?) != 0 ]; then
-	mkdir $dhDir 2> $log
+	mkdir $dhDir 2>> $log
 	if [ $(echo $?) != 0 ]; then
 		echo "Exited"
 		exit
@@ -118,7 +123,7 @@ fi
 ls $workdir | grep tls > /dev/null
 
 if [ $(echo $?) != 0 ]; then
-	mkdir $tlsDir 2> $log
+	mkdir $tlsDir 2>> $log
 	if [ $(echo $?) != 0 ]; then
 		echo "Exited"
 		exit
@@ -150,7 +155,7 @@ fi
 ls $workdir | grep server > /dev/null
 
 if [ $(echo $?) != 0 ]; then
-	mkdir $serverDir 2> $log
+	mkdir $serverDir 2>> $log
 	if [ $(echo $?) != 0 ]; then
 		echo "Exited"
 		exit
@@ -183,7 +188,7 @@ fi
 ls $workdir | grep client > /dev/null
 
 if [ $(echo $?) != 0 ]; then
-	mkdir $clientDir 2> $log
+	mkdir $clientDir 2>> $log
 	if [ $(echo $?) != 0 ]; then
 		echo "Exited"
 		exit
@@ -345,6 +350,38 @@ else
 fi
 
 # To do : Buat Agar bisa running servicenya & buat summary info ex: nama service, dll
+
+### Restarting Service
+
+systemctl restart openvpn@server 2>> $log && systemctl enable openvpn@server 2>> $log
+
+
+if [ $(echo $?) != 0 ]; then
+        echo -e "Restarting the Service\t\t\t\t| $failed"
+        exit
+else
+        echo -e "Restarting the Service OpenVPN\t\t\t\t| $success"
+		echo -e "\nYeay! Your VPN Server is Running"
+fi
+
+
+### Summary 
+
+cat << EOF > summary-installation.txt
+NAME|LOCATION
+ROOT CA Certificates Directory|$caDir
+TLS Directory|$tlsDir
+Diffie-Hellman Directory|$dhDir
+Server Certificate Directory|$serverDir
+Client ClieCertificate|$clientDir
+Server Configuration File|/etc/openvpn/server.conf
+Client Configuration File|/etc/openvpn/client/client.ovpn
+Service Name|openvpn@server.service
+EOF
+
+echo -e "\n${yellow}#### SUMMARY INSTALATIONS ####${white}\n"
+
+column summary-installation.txt -t -s "|"
 
 ### Elapsed Time
 
